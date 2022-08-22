@@ -1,0 +1,6 @@
+libalengine.a
+*.o
+build/
+.vscode/
+imgui.ini
+test/test_game
