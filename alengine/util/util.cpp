@@ -36,6 +36,10 @@ namespace ae {
             } else {
                 std::cerr << construct_string(level, message) << "\n";
             }
+
+            if (level == (LogLevel)LogLevel::ERROR) {
+                exit(1);
+            }
         }
     };
 };

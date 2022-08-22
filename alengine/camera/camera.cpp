@@ -14,6 +14,6 @@ namespace ae {
         return glm::ortho(0.0f, width / zoom, 0.0f, height / zoom, -10.0f, 10.0f);
     }
     glm::mat4 Camera::view() {
-        return glm::translate(glm::mat4(), -glm::vec3(pos, 0.0f));
+        return glm::translate(glm::mat4(1.0), -glm::vec3(pos, 0.0f));
     }
 };

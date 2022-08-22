@@ -74,6 +74,7 @@ namespace ae {
     void Window::destroy() {
         if (initialized) {
             initialized = false;
+            Renderer::destroy();
             glfwDestroyWindow(window);
             window = nullptr;
         }

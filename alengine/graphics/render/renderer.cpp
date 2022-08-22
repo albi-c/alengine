@@ -7,32 +7,40 @@ namespace ae {
     void Renderer::init() {
         resize(1, 1);
 
-        glDisable(GL_CULL_FACE);
+        shader = new Shader("color");
+
+        initialized = true;
+
         glEnable(GL_MULTISAMPLE);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+    }
+    void Renderer::destroy() {
+        if (initialized) {
+            initialized = false;
+            delete shader;
+        }
     }
 
     void Renderer::render_start() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
-    void Renderer::render(std::shared_ptr<Drawable>& object) {
-        objects.push_back(object);
+    void Renderer::render(const Drawable& object) {
+        vertex_lists.push_back(object.vertices());
+        num_vertices += vertex_lists.back().size();
     }
     void Renderer::render_end() {
         glm::mat4 transform = Camera::projection() * Camera::view();
 
-        int num_vertices = 0; 
+        std::vector<Vertex> vertices;
+        vertices.reserve(num_vertices);
 
-        for (auto& object : objects) {
-            num_vertices += object->num_vectices();
+        for (auto& vl : vertex_lists) {
+            vertices.insert(vertices.end(), vl.begin(), vl.end());
         }
 
-        std::vector<Vertex> vertices(num_vertices);
-
-        for (auto& object : objects) {
-            auto vert = object->vertices();
-            vertices.insert(vertices.end(), vert.begin(), vert.end());
-        }
+        shader->uniform("transform", transform);
 
         GLuint VAO, VBO;
 
@@ -50,12 +58,14 @@ namespace ae {
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
         glEnableVertexAttribArray(1);
 
+        shader->use();
         glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
 
-        objects.clear();
+        vertex_lists.clear();
+        num_vertices = 0;
     }
 
     void Renderer::resize(int width, int height) {

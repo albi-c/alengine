@@ -7,7 +7,11 @@
 namespace ae {
     class Drawable {
     public:
+        int layer = 0;
+
+        inline Drawable(int layer = 0)
+            : layer(layer) {}
+
         virtual std::vector<Vertex> vertices() const =0;
-        virtual int num_vectices() const =0;
     };
 };

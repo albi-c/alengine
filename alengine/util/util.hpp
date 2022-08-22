@@ -2,10 +2,7 @@
 
 #include <string>
 
-#ifndef BETTER_ENUMS_MACRO_FILE
-#define BETTER_ENUMS_MACRO_FILE "enum/enum_macros.h"
-#endif
-#include "enum/enum.h"
+#include "better_enum.hpp"
 
 namespace ae {
     namespace time {

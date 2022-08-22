@@ -4,10 +4,7 @@
 #include "mouse.hpp"
 #include "keyboard.hpp"
 
-#ifndef BETTER_ENUMS_MACRO_FILE
-#define BETTER_ENUMS_MACRO_FILE "enum/enum_macros.h"
-#endif
-#include "enum/enum.h"
+#include "better_enum.hpp"
 
 namespace ae {
     struct EventWindowResize : public Event {
