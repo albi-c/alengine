@@ -59,8 +59,7 @@ class Game : public ae::Game {
 public:
     Game()
         : ae::Game("Test Game"),
-          // player({50.0f, 250.0f}, {50.0f, 100.0f}),
-          player({50.0f, 250.0f}, {100.0f, 350.0f}),
+          player({50.0f, 250.0f}, {50.0f, 100.0f}),
           wall({{0.2f, 0.2f, 0.2f}}, {0.0f, 100.0f}, {1920.0f, 100.0f}),
           circle({{0.5f, 0.0f, 0.0f}}, {250.0f, 250.0f}, 50.0f) {
         
@@ -75,17 +74,27 @@ public:
         });
 
         ae::Event::on<ae::EventUpdate>([&](const ae::EventUpdate& e) {
-            glm::vec2 move;
-            if (e.keys[ae::Key::W])
+            bool movedX = false;
+            bool movedY = false;
+            glm::vec2 move = glm::vec2(0.0f);
+            if (e.keys[ae::Key::W]) {
                 move.y += 1.0f;
-            if (e.keys[ae::Key::A])
+                movedY = !movedY;
+            }
+            if (e.keys[ae::Key::A]) {
                 move.x -= 1.0f;
-            if (e.keys[ae::Key::S])
+                movedX = !movedX;
+            }
+            if (e.keys[ae::Key::S]) {
                 move.y -= 1.0f;
-            if (e.keys[ae::Key::D])
+                movedY = !movedY;
+            }
+            if (e.keys[ae::Key::D]) {
                 move.x += 1.0f;
+                movedX = !movedX;
+            }
             
-            if (move.x != 0.0f || move.y != 0.0f) {
+            if (movedX || movedY) {
                 move = glm::normalize(move) * e.dt * 200.0f;
 
                 player.moveX(move.x);
@@ -98,6 +107,8 @@ public:
                     player.moveY(-move.y);
                 }
             }
+
+            ae::Camera::pos = player.pos - ae::Window::size() / 2.0f;
         });
 
         ae::Event::on<ae::EventDraw>([&](const ae::EventDraw&) {
@@ -110,7 +121,7 @@ public:
     }
     
 private:
-    PlayerLine player;
+    Player player;
 
     ae::object::Rect wall;
     ae::object::Circle circle;

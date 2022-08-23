@@ -4,6 +4,7 @@
 
 #include "graphics/glfw.hpp"
 #include "event.hpp"
+#include "util/glm.hpp"
 
 #include "better_enum.hpp"
 
@@ -27,6 +28,8 @@ namespace ae {
         static float get_dt();
 
         static void get_keys(bool* keys);
+
+        static glm::vec2 size();
     
     private:
         static inline GLFWwindow* window;

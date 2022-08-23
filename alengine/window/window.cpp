@@ -114,6 +114,10 @@ namespace ae {
         }
     }
 
+    glm::vec2 Window::size() {
+        return {width, height};
+    }
+
     void Window::callback_framebuffer_resize(GLFWwindow* glfw_window, int width, int height) {
         Window::width = width;
         Window::height = height;
