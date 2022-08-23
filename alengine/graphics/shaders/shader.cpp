@@ -50,10 +50,11 @@ in vec2 TexCoord;
 
 out vec4 FragColor;
 
-uniform sampler2D tex_screen;
+uniform sampler2D tex_main;
+uniform sampler2D tex_light;
 
 void main() {
-    FragColor = texture(tex_screen, TexCoord);
+    FragColor = texture(tex_main, TexCoord);
 }
 )"}}
 };

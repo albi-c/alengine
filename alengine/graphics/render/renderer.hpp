@@ -32,6 +32,7 @@ namespace ae {
         static inline Shader* shader;
         static inline Shader* shader_post;
 
+        static inline Framebuffer main_fbo;
         static inline Framebuffer light_fbo;
 
         static inline VertexBuffer<TexVertex>* whole_screen;

@@ -21,6 +21,7 @@ namespace ae {
 
         whole_screen = new VertexBuffer<TexVertex>({3, 2}, WHOLE_SCREEN_VERTICES);
 
+        main_fbo.init(width, height);
         light_fbo.init(width, height);
 
         initialized = true;
@@ -34,6 +35,7 @@ namespace ae {
             initialized = false;
             delete shader;
             delete shader_post;
+            main_fbo.destroy();
             light_fbo.destroy();
         }
     }
@@ -85,10 +87,32 @@ namespace ae {
 
         shader->uniform("transform", transform);
 
+        // A
+        main_fbo.bind();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         VertexBuffer buffer({3, 3}, vertices);
 
         shader->use();
         buffer.draw();
+
+        // A
+        main_fbo.unbind();
+
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, main_fbo.tex());
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, light_fbo.tex());
+
+        shader_post->uniform("tex_main", 0);
+        shader_post->uniform("tex_light", 1);
+
+        shader_post->use();
+        whole_screen->draw();
+
 
         vertex_lists.clear();
         num_vertices = 0;
@@ -99,6 +123,9 @@ namespace ae {
         Renderer::height = height;
 
         glViewport(0, 0, width, height);
+
+        main_fbo.destroy();
+        main_fbo.init(width, height);
 
         light_fbo.destroy();
         light_fbo.init(width, height);
