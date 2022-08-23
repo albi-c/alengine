@@ -21,5 +21,7 @@ namespace ae {
         void run();
 
         void stop();
+
+        float time();
     };
 };

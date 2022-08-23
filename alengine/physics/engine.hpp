@@ -10,10 +10,10 @@ namespace ae::physics {
     public:
         static inline glm::vec2 gravity;
 
-        static void add(Collider* collider);
-        static void remove(Collider* collider);
+        static void add(Hitbox* collider);
+        static void remove(Hitbox* collider);
     
     private:
-        static inline std::unordered_set<Collider*> colliders;
+        static inline std::unordered_set<Hitbox*> colliders;
     };
 };

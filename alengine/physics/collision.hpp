@@ -3,49 +3,77 @@
 #include "util/glm.hpp"
 
 namespace ae::physics {
-    struct CollisionPoints {
-        bool collided;
-        glm::vec2 a, b;
-        glm::vec2 normal;
-        float depth;
+    class HitboxPoint;
+    class HitboxAABB;
+    class HitboxLine;
+    class HitboxCircle;
+    class Hitbox {
+    public:
+        virtual bool collide(const Hitbox& h) const =0;
+        virtual bool collide(const HitboxPoint& h) const =0;
+        virtual bool collide(const HitboxAABB& h) const =0;
+        virtual bool collide(const HitboxLine& h) const =0;
+        virtual bool collide(const HitboxCircle& h) const =0;
     };
 
-    class ColliderCircle;
-    class ColliderAABB;
-    class Collider {
+    class HitboxPoint : Hitbox {
     public:
-        Collider(const glm::vec2& pos);
-        ~Collider();
-
-        int layer = 0;
-
         glm::vec2 pos;
-        glm::vec2 vel;
 
-        virtual CollisionPoints collide(const Collider& collider) const =0;
-        virtual CollisionPoints collide(const ColliderCircle& collider) const =0;
-        virtual CollisionPoints collide(const ColliderAABB& collider) const =0;
+        HitboxPoint();
+        HitboxPoint(const glm::vec2& pos);
+
+        virtual bool collide(const Hitbox& h) const;
+        virtual bool collide(const HitboxPoint& h) const;
+        virtual bool collide(const HitboxAABB& h) const;
+        virtual bool collide(const HitboxLine& h) const;
+        virtual bool collide(const HitboxCircle& h) const;
     };
 
-    class ColliderCircle : public Collider {
+    class HitboxAABB : Hitbox {
     public:
-        float rad;
-
-        ColliderCircle(const glm::vec2& pos, float rad);
-
-        virtual CollisionPoints collide(const Collider& collider) const;
-        virtual CollisionPoints collide(const ColliderCircle& collider) const;
-        virtual CollisionPoints collide(const ColliderAABB& collider) const;
-    };
-
-    class ColliderAABB : public Collider {
-    public:
+        glm::vec2 pos;
         glm::vec2 size;
 
-        ColliderAABB(const glm::vec2& pos, const glm::vec2& size);
+        HitboxAABB();
+        HitboxAABB(const glm::vec2& pos, const glm::vec2& size);
 
-        virtual CollisionPoints collide(const Collider& collider) const;
-        virtual CollisionPoints collide(const ColliderCircle& collider) const;
-        virtual CollisionPoints collide(const ColliderAABB& collider) const;
+        virtual bool collide(const Hitbox& h) const;
+        virtual bool collide(const HitboxPoint& h) const;
+        virtual bool collide(const HitboxAABB& h) const;
+        virtual bool collide(const HitboxLine& h) const;
+        virtual bool collide(const HitboxCircle& h) const;
+    };
+
+    class HitboxLine : Hitbox {
+    public:
+        glm::vec2 p1;
+        glm::vec2 p2;
+
+        HitboxLine();
+        HitboxLine(const glm::vec2& p1, const glm::vec2& p2);
+
+        float length() const;
+
+        virtual bool collide(const Hitbox& h) const;
+        virtual bool collide(const HitboxPoint& h) const;
+        virtual bool collide(const HitboxAABB& h) const;
+        virtual bool collide(const HitboxLine& h) const;
+        virtual bool collide(const HitboxCircle& h) const;
+    };
+
+    class HitboxCircle : Hitbox {
+    public:
+        glm::vec2 pos;
+        float rad;
+
+        HitboxCircle();
+        HitboxCircle(const glm::vec2& pos, float rad);
+
+        virtual bool collide(const Hitbox& h) const;
+        virtual bool collide(const HitboxPoint& h) const;
+        virtual bool collide(const HitboxAABB& h) const;
+        virtual bool collide(const HitboxLine& h) const;
+        virtual bool collide(const HitboxCircle& h) const;
     };
 };

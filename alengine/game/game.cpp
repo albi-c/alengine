@@ -23,4 +23,8 @@ namespace ae {
     void Game::stop() {
         Window::close();
     }
+
+    float Game::time() {
+        return (float)glfwGetTime();
+    }
 };

@@ -15,11 +15,11 @@ int main() {
     player_rect.layer = 1;
     ae::entity::Player player(player_rect);
 
-    ae::physics::ColliderCircle a({0.0f, 0.0f}, 4.0f);
-    ae::physics::ColliderCircle b({5.0f, 5.0f}, 4.0f);
+    ae::physics::HitboxCircle a({0.0f, 0.0f}, 4.0f);
+    ae::physics::HitboxCircle b({5.0f, 5.0f}, 4.0f);
     auto c = a.collide(b);
 
-    // TODO: other colliders, engine
+    
 
     ae::Event::on<ae::EventKeyPress>([&](const ae::EventKeyPress& e) {
         if (e == ae::Key::ESCAPE && e == ae::Action::RELEASE) {
@@ -31,7 +31,7 @@ int main() {
     });
 
     ae::Event::on<ae::EventDraw>([&](const ae::EventDraw&) {
-        ae::object::Rect({{1.0f, 0.0f, 0.0f}}, {0.0f, 0.0f}, {100.0f, 100.0f}).draw();
+        ae::object::Rect({{1.0f, 0.0f, 0.0f}}, glm::vec2(game.time() * 10.0f), {100.0f, 100.0f}).draw();
         ae::Renderer::render(player);
     });
 
