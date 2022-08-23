@@ -107,8 +107,6 @@ namespace ae::physics {
         return h.collide(*this);
     }
     bool HitboxLine::collide(const HitboxLine& h) const {
-        // TODO: broken
-        
         glm::vec2 s1 = p2 - p1;
         glm::vec2 s2 = h.p2 - h.p1;
 
@@ -118,8 +116,6 @@ namespace ae::physics {
         return s >= 0 && s <= 1 && t >= 0 && t <= 1;
     }
     bool HitboxLine::collide(const HitboxCircle& h) const {
-        // TODO: broken
-
         glm::vec2 d = p2 - p1;
         glm::vec2 f = p1 - h.pos;
 
@@ -144,20 +140,6 @@ namespace ae::physics {
         }
 
         return false;
-
-        // broken part
-
-        // if (HitboxPoint{p1}.collide(h) || HitboxPoint{p2}.collide(h))
-        //     return true;
-        
-        // float l = length();
-        // float d = glm::dot(h.pos - p1, p2 - p1) / glm::pow(l, 2.0f);
-        // glm::vec2 c = p1 + (d * (p2 - p1));
-
-        // if (!HitboxPoint{c}.collide(*this))
-        //     return false;
-        
-        // return d < h.rad;
     }
     
     HitboxCircle::HitboxCircle()
