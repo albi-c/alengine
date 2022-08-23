@@ -30,6 +30,7 @@ namespace ae {
         static inline std::vector<Light> lights;
 
         static inline Shader* shader;
+        static inline Shader* shader_light;
         static inline Shader* shader_post;
 
         static inline Framebuffer main_fbo;

@@ -2,6 +2,7 @@
 
 #include "graphics/opengl.hpp"
 #include "camera/camera.hpp"
+#include "graphics/buffer/texture.hpp"
 
 namespace ae {
     static const std::vector<TexVertex> WHOLE_SCREEN_VERTICES = {
@@ -17,6 +18,7 @@ namespace ae {
         resize(1, 1);
 
         shader = new Shader("color");
+        shader_light = new Shader("light");
         shader_post = new Shader("post");
 
         whole_screen = new VertexBuffer<TexVertex>({3, 2}, WHOLE_SCREEN_VERTICES);
@@ -34,6 +36,7 @@ namespace ae {
         if (initialized) {
             initialized = false;
             delete shader;
+            delete shader_light;
             delete shader_post;
             main_fbo.destroy();
             light_fbo.destroy();
@@ -67,16 +70,37 @@ namespace ae {
     void Renderer::render_end() {
         glm::mat4 transform = Camera::projection() * Camera::view();
 
+        // LIGHTING PASS
+
+        TextureBuffer lights_tex(&lights[0], lights.size() * sizeof(Light));
+
+        glActiveTexture(GL_TEXTURE0);
+        lights_tex.bind();
+
+        shader_light->uniform("lights", 0);
+        shader_light->uniform("n_lights", (int)lights.size());
+
+        shader_light->uniform("transform", transform);
+
         light_fbo.bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        shader_light->use();
 
-        // TODO: render lights, light shader
-        for (auto& light : lights) {
-            //
-        }
+        VertexBuffer<glm::vec2> light_vertex_buffer({2}, {
+            {0.0f, 0.0f},
+            {0.0f, (float)height},
+            {(float)width, (float)height},
+            {0.0f, 0.0f},
+            {(float)width, (float)height},
+            {(float)width, 0.0f}
+        });
+        light_vertex_buffer.draw();
 
         light_fbo.unbind();
+
+        // MAIN PASS
 
         std::vector<Vertex> vertices;
         vertices.reserve(num_vertices);
@@ -87,7 +111,6 @@ namespace ae {
 
         shader->uniform("transform", transform);
 
-        // A
         main_fbo.bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -97,9 +120,10 @@ namespace ae {
         shader->use();
         buffer.draw();
 
-        // A
         main_fbo.unbind();
 
+
+        // POSTPROCESSING PASS
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, main_fbo.tex());

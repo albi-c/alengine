@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "graphics/opengl.hpp"
-#include "graphics/render/vertex.hpp"
 
 namespace ae {
     template <class T>

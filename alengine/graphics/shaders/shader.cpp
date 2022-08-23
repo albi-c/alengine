@@ -54,7 +54,46 @@ uniform sampler2D tex_main;
 uniform sampler2D tex_light;
 
 void main() {
-    FragColor = texture(tex_main, TexCoord);
+    FragColor = texture(tex_main, TexCoord) * texture(tex_light, TexCoord);
+}
+)"}}, {"light", {R"(
+#version 330 core
+layout (location = 0) in vec2 aPos;
+
+out vec2 FragPos;
+
+uniform mat4 transform;
+
+void main() {
+    gl_Position = transform * vec4(aPos, 0.0, 1.0);
+
+    FragPos = aPos.xy;
+}
+)", R"(
+#version 330 core
+in vec2 FragPos;
+
+out vec4 FragColor;
+
+uniform samplerBuffer lights;
+uniform int n_lights;
+
+vec3 t(int pos) {
+    int p = pos * 3;
+    return vec3(texelFetch(lights, p).r, texelFetch(lights, p + 1).r, texelFetch(lights, p + 2).r);
+}
+
+void main() {
+    vec3 light = vec3(0.0);
+
+    for (int i = 0; i < n_lights; i++) {
+        vec3 c = t(i * 2);
+        if (distance(c.xy, FragPos) <= c.z) {
+            light += t(i * 2 + 1);
+        }
+    }
+
+    FragColor = vec4(light + 0.3, 1.0);
 }
 )"}}
 };

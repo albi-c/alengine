@@ -5,11 +5,11 @@
 namespace ae {
     struct Light {
         glm::vec2 pos;
-
-        glm::vec3 color;
         float range;
 
-        float angle = glm::radians(360.0f);
-        float rotation = 0.0f;
+        glm::vec3 color;
+
+        Light(const glm::vec2& pos, float range, const glm::vec3& color = glm::vec3(1.0f))
+            : pos(pos), range(range), color(color) {}
     };
 };

@@ -61,7 +61,8 @@ public:
         : ae::Game("Test Game"),
           player({50.0f, 250.0f}, {50.0f, 100.0f}),
           wall({{0.2f, 0.2f, 0.2f}}, {0.0f, 100.0f}, {1920.0f, 100.0f}),
-          circle({{0.5f, 0.0f, 0.0f}}, {250.0f, 250.0f}, 50.0f) {
+          circle({{0.5f, 0.0f, 0.0f}}, {250.0f, 250.0f}, 50.0f),
+          light({100.0f, 100.0f}, 100.0f, {1.0f, 1.0f, 0.0f}) {
         
         ae::Event::on<ae::EventWindowResize>([&](const ae::EventWindowResize& e) {
             wall.size.x = e.width;
@@ -125,6 +126,8 @@ private:
 
     ae::object::Rect wall;
     ae::object::Circle circle;
+
+    ae::Light light;
 };
 
 int main() {
