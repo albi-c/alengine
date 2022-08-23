@@ -4,10 +4,24 @@
 #include "camera/camera.hpp"
 
 namespace ae {
+    static const std::vector<TexVertex> WHOLE_SCREEN_VERTICES = {
+        {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
+        {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}},
+        {{ 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},
+        {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
+        {{ 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},
+        {{ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}}
+    };
+
     void Renderer::init() {
         resize(1, 1);
 
         shader = new Shader("color");
+        shader_post = new Shader("post");
+
+        whole_screen = new VertexBuffer<TexVertex>({3, 2}, WHOLE_SCREEN_VERTICES);
+
+        light_fbo.init(width, height);
 
         initialized = true;
 
@@ -19,6 +33,8 @@ namespace ae {
         if (initialized) {
             initialized = false;
             delete shader;
+            delete shader_post;
+            light_fbo.destroy();
         }
     }
 
@@ -38,9 +54,27 @@ namespace ae {
         }
         vertex_lists.push_back(vertices);
         num_vertices += vertices.size();
+
+        const Light* light_p = object.light();
+        if (light_p != nullptr) {
+            Light light = *object.light();
+            light.pos += translate;
+            lights.push_back(light);
+        }
     }
     void Renderer::render_end() {
         glm::mat4 transform = Camera::projection() * Camera::view();
+
+        light_fbo.bind();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // TODO: render lights, light shader
+        for (auto& light : lights) {
+            //
+        }
+
+        light_fbo.unbind();
 
         std::vector<Vertex> vertices;
         vertices.reserve(num_vertices);
@@ -51,27 +85,10 @@ namespace ae {
 
         shader->uniform("transform", transform);
 
-        GLuint VAO, VBO;
-
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-
-        glBindVertexArray(VAO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
-        glEnableVertexAttribArray(1);
+        VertexBuffer buffer({3, 3}, vertices);
 
         shader->use();
-        glDrawArrays(GL_TRIANGLES, 0, num_vertices);
-
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(1, &VBO);
+        buffer.draw();
 
         vertex_lists.clear();
         num_vertices = 0;
@@ -82,5 +99,8 @@ namespace ae {
         Renderer::height = height;
 
         glViewport(0, 0, width, height);
+
+        light_fbo.destroy();
+        light_fbo.init(width, height);
     }
 };

@@ -2,6 +2,8 @@
 
 #include "renderable.hpp"
 #include "graphics/shaders/shader.hpp"
+#include "graphics/framebuffer/framebuffer.hpp"
+#include "graphics/buffer/vertex.hpp"
 
 #include <memory>
 
@@ -25,6 +27,13 @@ namespace ae {
         static inline int num_vertices = 0;
         static inline std::vector<std::vector<Vertex>> vertex_lists;
 
+        static inline std::vector<Light> lights;
+
         static inline Shader* shader;
+        static inline Shader* shader_post;
+
+        static inline Framebuffer light_fbo;
+
+        static inline VertexBuffer<TexVertex>* whole_screen;
     };
 };

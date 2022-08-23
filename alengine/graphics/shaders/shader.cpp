@@ -30,6 +30,31 @@ out vec4 FragColor;
 void main() {
     FragColor = vec4(Color, 1.0);
 }
+)"}}, {"post", {R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 aTex;
+
+out vec2 TexCoord;
+
+uniform mat4 transform;
+
+void main() {
+    gl_Position = vec4(aPos, 1.0);
+
+    TexCoord = aTex;
+}
+)", R"(
+#version 330 core
+in vec2 TexCoord;
+
+out vec4 FragColor;
+
+uniform sampler2D tex_screen;
+
+void main() {
+    FragColor = texture(tex_screen, TexCoord);
+}
 )"}}
 };
 

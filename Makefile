@@ -51,7 +51,6 @@ $(OBJDIR)/%.o: %.c
 .PHONY: clean
 clean:
 	rm -f $(LIB) $(OBJECTS) $(COBJECTS)
-	rm -rf $(OBJDIR)
 
 .PHONY: clean_libs
 clean_libs:
