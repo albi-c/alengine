@@ -64,3 +64,4 @@ cdebug:
 
 clean:
 	rm -f $(EXEC) $(OBJECTS) $(COBJECTS)
+	rm -rf $(OBJDIR)

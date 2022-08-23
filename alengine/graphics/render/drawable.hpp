@@ -1,17 +1,16 @@
 #pragma once
 
-#include "vertex.hpp"
-
-#include <vector>
+#include "renderer.hpp"
+#include "renderable.hpp"
 
 namespace ae {
-    class Drawable {
+    class Drawable : public Renderable {
     public:
-        int layer = 0;
-
         inline Drawable(int layer = 0)
-            : layer(layer) {}
-
-        virtual std::vector<Vertex> vertices() const =0;
+            : Renderable(layer) {}
+        
+        inline void draw(const glm::vec2& translate = glm::vec2(0.0f)) const {
+            Renderer::render(*this, translate);
+        }
     };
 };

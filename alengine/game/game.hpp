@@ -8,8 +8,9 @@
 namespace ae {
     struct EventUpdate : public Event {
         float dt;
+        bool* keys;
 
-        EventUpdate(float dt) : dt(dt) {}
+        EventUpdate(float dt, bool* keys) : dt(dt), keys(keys) {}
     };
     struct EventDraw : public Event {};
 

@@ -1,5 +1,5 @@
 #!/bin/sh
 
-make
+make -j12
 cd test
-make run
+make -j12 run

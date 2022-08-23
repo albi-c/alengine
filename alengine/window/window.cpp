@@ -108,6 +108,12 @@ namespace ae {
         return (float)dt;
     }
 
+    void Window::get_keys(bool* keys) {
+        for (int i = 0; i < GLFW_KEY_LAST; i++) {
+            keys[i] = glfwGetKey(window, i);
+        }
+    }
+
     void Window::callback_framebuffer_resize(GLFWwindow* glfw_window, int width, int height) {
         Window::width = width;
         Window::height = height;

@@ -2,40 +2,122 @@
 
 #include "objects/shapes/rect.hpp"
 #include "objects/shapes/circle.hpp"
+#include "objects/shapes/line.hpp"
 #include "camera/camera.hpp"
 #include "entity/player.hpp"
-#include "physics/engine.hpp"
 
 #include <iostream>
 
-int main() {
-    ae::Game game("Test Game");
+class Player : public ae::entity::Player {
+public:
+    ae::object::Rect obj;
 
-    ae::object::Rect player_rect({{0.0f, 1.0f, 1.0f}}, {0.0f, 0.0f}, {50.0f, 100.0f});
-    player_rect.layer = 1;
-    ae::entity::Player player(player_rect);
+    glm::vec2 pos;
+    glm::vec2 size;
 
-    ae::physics::HitboxCircle a({0.0f, 0.0f}, 4.0f);
-    ae::physics::HitboxCircle b({5.0f, 5.0f}, 4.0f);
-    auto c = a.collide(b);
-
+    Player(const glm::vec2& pos, const glm::vec2& size)
+        : obj({{1.0f, 0.8f, 0.6f}}, &this->pos, &this->size), pos(pos), size(size), ae::entity::Player(obj) {}
     
+    void move(const glm::vec2& m) {
+        pos += m;
+    }
 
-    ae::Event::on<ae::EventKeyPress>([&](const ae::EventKeyPress& e) {
-        if (e == ae::Key::ESCAPE && e == ae::Action::RELEASE) {
-            game.stop();
-        }
-    });
+    void moveX(float m) {
+        pos.x += m;
+    }
+    void moveY(float m) {
+        pos.y += m;
+    }
+};
 
-    ae::Event::on<ae::EventUpdate>([&](const ae::EventUpdate& e) {
-    });
+class PlayerLine : public ae::entity::Player {
+public:
+    ae::object::Line obj;
 
-    ae::Event::on<ae::EventDraw>([&](const ae::EventDraw&) {
-        ae::object::Rect({{1.0f, 0.0f, 0.0f}}, glm::vec2(game.time() * 10.0f), {100.0f, 100.0f}).draw();
-        ae::Renderer::render(player);
-    });
+    glm::vec2 p1;
+    glm::vec2 p2;
 
-    game.run();
+    PlayerLine(const glm::vec2& p1, const glm::vec2& p2)
+        : obj({{0.0f, 0.0f, 1.0f}}, &this->p1, &this->p2), p1(p1), p2(p2), ae::entity::Player(obj) {}
+    
+    void move(const glm::vec2& m) {
+        p1 += m;
+        p2 += m;
+    }
+
+    void moveX(float m) {
+        p1.x += m;
+        p2.x += m;
+    }
+    void moveY(float m) {
+        p1.y += m;
+        p2.y += m;
+    }
+};
+
+class Game : public ae::Game {
+public:
+    Game()
+        : ae::Game("Test Game"),
+          // player({50.0f, 250.0f}, {50.0f, 100.0f}),
+          player({50.0f, 250.0f}, {100.0f, 350.0f}),
+          wall({{0.2f, 0.2f, 0.2f}}, {0.0f, 100.0f}, {1920.0f, 100.0f}),
+          circle({{0.5f, 0.0f, 0.0f}}, {250.0f, 250.0f}, 50.0f) {
+        
+        ae::Event::on<ae::EventWindowResize>([&](const ae::EventWindowResize& e) {
+            wall.size.x = e.width;
+        });
+
+        ae::Event::on<ae::EventKeyPress>([&](const ae::EventKeyPress& e) {
+            if (e == ae::Key::ESCAPE && e == ae::Action::RELEASE) {
+                stop();
+            }
+        });
+
+        ae::Event::on<ae::EventUpdate>([&](const ae::EventUpdate& e) {
+            glm::vec2 move;
+            if (e.keys[ae::Key::W])
+                move.y += 1.0f;
+            if (e.keys[ae::Key::A])
+                move.x -= 1.0f;
+            if (e.keys[ae::Key::S])
+                move.y -= 1.0f;
+            if (e.keys[ae::Key::D])
+                move.x += 1.0f;
+            
+            if (move.x != 0.0f || move.y != 0.0f) {
+                move = glm::normalize(move) * e.dt * 200.0f;
+
+                player.moveX(move.x);
+                if (player.obj.collide(wall) || player.obj.collide(circle)) {
+                    player.moveX(-move.x);
+                }
+
+                player.moveY(move.y);
+                if (player.obj.collide(wall) || player.obj.collide(circle)) {
+                    player.moveY(-move.y);
+                }
+            }
+        });
+
+        ae::Event::on<ae::EventDraw>([&](const ae::EventDraw&) {
+            player.draw();
+            wall.draw();
+            circle.draw();
+        });
+
+        run();
+    }
+    
+private:
+    PlayerLine player;
+
+    ae::object::Rect wall;
+    ae::object::Circle circle;
+};
+
+int main() {
+    Game game;
 
     return 0;
 }

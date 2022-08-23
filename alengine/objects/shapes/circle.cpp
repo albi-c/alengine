@@ -5,11 +5,14 @@ namespace ae::object {
     static constexpr int CIRCLE_VERTICES = 1080 / CIRCLE_STEP;
     static constexpr int CIRCLE_STEPS = 360 / CIRCLE_STEP;
 
-    Circle::Circle() {}
+    Circle::Circle()
+        : HitboxCircle() {}
     Circle::Circle(const Material& mat)
-        : mat(mat) {}
+        : HitboxCircle(), mat(mat) {}
     Circle::Circle(const Material& mat, const glm::vec2& pos, float rad)
-        : pos(pos), rad(rad), mat(mat) {}
+        : HitboxCircle(pos, rad), mat(mat) {}
+    Circle::Circle(const Material& mat, glm::vec2* pos, float* rad)
+        : HitboxCircle(pos, rad), mat(mat) {}
 
     std::vector<Vertex> Circle::vertices() const {
         std::vector<Vertex> vertices;

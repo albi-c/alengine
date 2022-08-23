@@ -26,9 +26,18 @@ namespace ae {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
-    void Renderer::render(const Drawable& object) {
-        vertex_lists.push_back(object.vertices());
-        num_vertices += vertex_lists.back().size();
+    void Renderer::render(const Renderable& object, const glm::vec2& translate) {
+        auto vertices = object.vertices();
+        if (translate != glm::vec2(0.0f)) {
+            std::vector<Vertex> t_vertices;
+            t_vertices.reserve(vertices.size());
+            for (auto& v : vertices) {
+                t_vertices.push_back({v.position + glm::vec3(translate, 0.0f), v.color});
+            }
+            vertices = t_vertices;
+        }
+        vertex_lists.push_back(vertices);
+        num_vertices += vertices.size();
     }
     void Renderer::render_end() {
         glm::mat4 transform = Camera::projection() * Camera::view();

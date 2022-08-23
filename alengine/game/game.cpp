@@ -9,8 +9,11 @@ namespace ae {
     }
 
     void Game::run() {
+        bool keys[Key::_LAST_KEY + 1];
+
         while (Window::update()) {
-            EventUpdate{Window::get_dt()}.fire();
+            Window::get_keys(keys);
+            EventUpdate{Window::get_dt(), keys}.fire();
 
             Window::render_start();
 

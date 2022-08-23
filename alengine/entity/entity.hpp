@@ -8,15 +8,11 @@ namespace ae::entity {
     public:
         object::Object* object;
 
-        inline Entity(object::Object& object)
-            : object(&object) {}
+        inline Entity(object::Object* object)
+            : object(object) {}
 
         inline virtual std::vector<Vertex> vertices() const {
             return object->vertices();
-        }
-
-        inline void draw() const {
-            Renderer::render(*object);
         }
     };
 };

@@ -25,6 +25,8 @@ namespace ae {
         static void close();
 
         static float get_dt();
+
+        static void get_keys(bool* keys);
     
     private:
         static inline GLFWwindow* window;
