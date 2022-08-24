@@ -81,20 +81,16 @@ namespace ae {
 
         // LIGHTING PASS
 
-        TextureBuffer lights_tex(&lights[0], lights.size() * sizeof(Light));
-
-        glActiveTexture(GL_TEXTURE0);
-        lights_tex.bind();
-
-        shader_light->uniform("lights", 0);
-        shader_light->uniform("n_lights", (int)lights.size());
-
         shader_light->uniform("projection", projection);
         shader_light->uniform("view", Camera::view(true));
 
         light_fbo.bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
         VertexBuffer<glm::vec2> light_vertex_buffer({2}, {
             {0.0f, 0.0f},
@@ -105,7 +101,17 @@ namespace ae {
             {(float)width, 0.0f}
         });
         shader_light->use();
-        light_vertex_buffer.draw();
+
+        for (auto& light : lights) {
+            shader_light->uniform("light_pos", light.pos);
+            shader_light->uniform("light_range", light.range);
+            shader_light->uniform("light_color", light.color);
+
+            light_vertex_buffer.draw();
+        }
+
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
 
         light_fbo.unbind();
 

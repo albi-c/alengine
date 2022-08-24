@@ -56,7 +56,12 @@ uniform sampler2D tex_light;
 void main() {
     vec3 color = texture(tex_main, TexCoord).xyz;
     vec3 light = texture(tex_light, TexCoord).xyz;
-    FragColor = vec4(color * light + light * 0.1, 1.0);
+
+    vec3 o = color * light + light * 0.01;
+    o /= o + 1.0;
+    o = pow(o, vec3(1 / 1.5));
+
+    FragColor = vec4(o, 1.0);
 }
 )"}}, {"light", {R"(
 #version 330 core
@@ -78,48 +83,19 @@ in vec2 FragPos;
 
 out vec4 FragColor;
 
-uniform samplerBuffer lights;
-uniform int n_lights;
-
-vec3 t(int pos) {
-    int p = pos * 3;
-    return vec3(texelFetch(lights, p).r, texelFetch(lights, p + 1).r, texelFetch(lights, p + 2).r);
-}
+uniform vec2 light_pos;
+uniform float light_range;
+uniform vec3 light_color;
 
 void main() {
     vec3 light = vec3(0.3);
 
-    for (int i = 0; i < n_lights; i++) {
-        vec3 c = t(i * 2);
-        float d = distance(c.xy, FragPos);
-        if (d <= c.z) {
-            light += t(i * 2 + 1) * (c.z - d) / c.z;
-        }
+    float d = distance(light_pos, FragPos);
+    if (d <= light_range) {
+        light += light_color * (light_range - d) / light_range;
     }
 
     FragColor = vec4(light, 1.0);
-}
-)"}}, {"depth", {R"(
-#version 330 core
-layout (location = 0) in vec3 aPos;
-
-out float layer;
-
-uniform mat4 transform;
-
-void main() {
-    gl_Position = transform * vec4(aPos, 1.0);
-
-    layer = aPos.z;
-}
-)", R"(
-#version 330 core
-
-in float layer;
-
-void main() {
-    if (layer < -0.1)
-        discard;
 }
 )"}}
 };
