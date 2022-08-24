@@ -98,8 +98,28 @@ void main() {
     }
 
     FragColor = vec4(light, 1.0);
+}
+)"}}, {"depth", {R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
 
-    // FragColor = vec4(FragPos / 1000.0, 0.0, 1.0);
+out float layer;
+
+uniform mat4 transform;
+
+void main() {
+    gl_Position = transform * vec4(aPos, 1.0);
+
+    layer = aPos.z;
+}
+)", R"(
+#version 330 core
+
+in float layer;
+
+void main() {
+    if (layer < -0.1)
+        discard;
 }
 )"}}
 };

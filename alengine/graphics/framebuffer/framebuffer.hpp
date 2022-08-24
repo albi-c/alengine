@@ -7,7 +7,7 @@ namespace ae {
     public:
         ~Framebuffer();
 
-        void init(int width, int height);
+        void init(int width, int height, bool depth_only = false);
         void destroy();
 
         void bind();

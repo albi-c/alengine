@@ -35,9 +35,11 @@ namespace ae {
     void Renderer::destroy() {
         if (initialized) {
             initialized = false;
+
             delete shader;
             delete shader_light;
             delete shader_post;
+
             main_fbo.destroy();
             light_fbo.destroy();
         }
@@ -68,6 +70,15 @@ namespace ae {
         glm::mat4 projection = Camera::projection();
         glm::mat4 transform = projection * view;
 
+        std::vector<Vertex> vertices;
+        vertices.reserve(num_vertices);
+
+        for (auto& vl : vertex_lists) {
+            vertices.insert(vertices.end(), vl.begin(), vl.end());
+        }
+
+        VertexBuffer buffer({3, 3}, vertices);
+
         // LIGHTING PASS
 
         TextureBuffer lights_tex(&lights[0], lights.size() * sizeof(Light));
@@ -84,8 +95,6 @@ namespace ae {
         light_fbo.bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        shader_light->use();
 
         VertexBuffer<glm::vec2> light_vertex_buffer({2}, {
             {0.0f, 0.0f},
@@ -95,26 +104,18 @@ namespace ae {
             {(float)width, (float)height},
             {(float)width, 0.0f}
         });
+        shader_light->use();
         light_vertex_buffer.draw();
 
         light_fbo.unbind();
 
         // MAIN PASS
 
-        std::vector<Vertex> vertices;
-        vertices.reserve(num_vertices);
-
-        for (auto& vl : vertex_lists) {
-            vertices.insert(vertices.end(), vl.begin(), vl.end());
-        }
-
         shader->uniform("transform", transform);
 
         main_fbo.bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        VertexBuffer buffer({3, 3}, vertices);
 
         shader->use();
         buffer.draw();
