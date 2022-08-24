@@ -14,6 +14,5 @@ namespace ae {
             : layer(layer) {}
 
         virtual std::vector<Vertex> vertices() const =0;
-        virtual const Light* light() const { return nullptr; }
     };
 };

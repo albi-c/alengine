@@ -54,7 +54,9 @@ uniform sampler2D tex_main;
 uniform sampler2D tex_light;
 
 void main() {
-    FragColor = texture(tex_main, TexCoord) * texture(tex_light, TexCoord);
+    vec3 color = texture(tex_main, TexCoord).xyz;
+    vec3 light = texture(tex_light, TexCoord).xyz;
+    FragColor = vec4(color * light + light * 0.1, 1.0);
 }
 )"}}, {"light", {R"(
 #version 330 core
@@ -85,16 +87,19 @@ vec3 t(int pos) {
 }
 
 void main() {
-    vec3 light = vec3(0.0);
+    vec3 light = vec3(0.3);
 
     for (int i = 0; i < n_lights; i++) {
         vec3 c = t(i * 2);
-        if (distance(c.xy, FragPos) <= c.z) {
-            light += t(i * 2 + 1);
+        float d = distance(c.xy, FragPos);
+        if (d <= c.z) {
+            light += t(i * 2 + 1) * (c.z - d) / c.z;
         }
     }
 
-    FragColor = vec4(light + 0.3, 1.0);
+    FragColor = vec4(light, 1.0);
+
+    // FragColor = vec4(FragPos / 1000.0, 0.0, 1.0);
 }
 )"}}
 };

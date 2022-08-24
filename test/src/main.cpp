@@ -62,7 +62,7 @@ public:
           player({50.0f, 250.0f}, {50.0f, 100.0f}),
           wall({{0.2f, 0.2f, 0.2f}}, {0.0f, 100.0f}, {1920.0f, 100.0f}),
           circle({{0.5f, 0.0f, 0.0f}}, {250.0f, 250.0f}, 50.0f),
-          light({100.0f, 100.0f}, 100.0f, {1.0f, 1.0f, 0.0f}) {
+          light({100.0f, 300.0f}, 500.0f, {1.0f, 0.9f, 0.7f}) {
         
         ae::Event::on<ae::EventWindowResize>([&](const ae::EventWindowResize& e) {
             wall.size.x = e.width;
@@ -96,7 +96,7 @@ public:
             }
             
             if (movedX || movedY) {
-                move = glm::normalize(move) * e.dt * 200.0f;
+                move = glm::normalize(move) * e.dt * 500.0f;
 
                 player.moveX(move.x);
                 if (player.obj.collide(wall) || player.obj.collide(circle)) {
@@ -116,6 +116,8 @@ public:
             player.draw();
             wall.draw();
             circle.draw();
+
+            light.draw();
         });
 
         run();

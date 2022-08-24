@@ -58,13 +58,10 @@ namespace ae {
         }
         vertex_lists.push_back(vertices);
         num_vertices += vertices.size();
-
-        const Light* light_p = object.light();
-        if (light_p != nullptr) {
-            Light light = *object.light();
-            light.pos += translate;
-            lights.push_back(light);
-        }
+    }
+    void Renderer::render(Light light, const glm::vec2& translate) {
+        light.pos += translate;
+        lights.push_back(light);
     }
     void Renderer::render_end() {
         glm::mat4 view = Camera::view();
@@ -82,7 +79,7 @@ namespace ae {
         shader_light->uniform("n_lights", (int)lights.size());
 
         shader_light->uniform("projection", projection);
-        shader_light->uniform("view", view);
+        shader_light->uniform("view", Camera::view(true));
 
         light_fbo.bind();
 
@@ -141,6 +138,7 @@ namespace ae {
         whole_screen->draw();
 
 
+        lights.clear();
         vertex_lists.clear();
         num_vertices = 0;
     }

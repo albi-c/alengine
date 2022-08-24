@@ -15,6 +15,7 @@ namespace ae {
 
         static void render_start();
         static void render(const Renderable& object, const glm::vec2& translate = glm::vec2(0.0f));
+        static void render(Light light, const glm::vec2& translate = glm::vec2(0.0f));
         static void render_end();
 
         static void resize(int width, int height);
