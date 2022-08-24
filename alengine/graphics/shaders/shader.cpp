@@ -66,11 +66,15 @@ void main() {
 
     vec3 color = texture(tex_main1, TexCoord).rgb;
 
+    if (depth1 > depth2) {
+        color = texture(tex_main2, TexCoord).rgb;
+    }
+
     vec3 o = color * (light + 0.05) + light * 0.1 + 0.003;
 
-    if (depth1 > depth2) {
-        o = texture(tex_main2, TexCoord).rgb;
-    }
+    // if (depth1 > depth2) {
+    //     o = texture(tex_main2, TexCoord).rgb;
+    // }
     
     o /= o + 1.0;
     o = pow(o, vec3(1.0 / 1.8));
@@ -117,7 +121,7 @@ void main() {
 
     float d = distance(light_pos, FragPos);
     if (d <= light_range) {
-        light = (light_color * (light_range - d) / light_range);
+        light = (light_color * pow(light_range - d, 2.0) / pow(light_range, 2.0));
     }
 
     FragColor = vec4(light, 1.0);

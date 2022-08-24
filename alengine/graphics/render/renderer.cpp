@@ -103,53 +103,53 @@ namespace ae {
 
         VertexBuffer buffer_front({3, 3}, vertices_front);
 
-        // SHADOW PASS
+        // SHADOW PASS (DISABLED)
 
-        std::vector<glm::vec4> shadow_lines;
-        for (int i = 0; i < vertices_front.size(); i += 3) {
-            if (vertices_front[i].position.z < -0.1)
-                continue;
+        // std::vector<glm::vec4> shadow_lines;
+        // for (int i = 0; i < vertices_front.size(); i += 3) {
+        //     if (vertices_front[i].position.z < -0.1)
+        //         continue;
             
-            shadow_lines.push_back({vertices_front[i + 0].position.xy(), vertices_front[i + 1].position.xy()});
-            shadow_lines.push_back({vertices_front[i + 1].position.xy(), vertices_front[i + 2].position.xy()});
-            shadow_lines.push_back({vertices_front[i + 0].position.xy(), vertices_front[i + 2].position.xy()});
-        }
+        //     shadow_lines.push_back({vertices_front[i + 0].position.xy(), vertices_front[i + 1].position.xy()});
+        //     shadow_lines.push_back({vertices_front[i + 1].position.xy(), vertices_front[i + 2].position.xy()});
+        //     shadow_lines.push_back({vertices_front[i + 0].position.xy(), vertices_front[i + 2].position.xy()});
+        // }
 
-        std::vector<glm::vec3> shadow_vertices;
-        shadow_vertices.reserve(shadow_lines.size() * 6);
-        for (auto& line : shadow_lines) {
-            shadow_vertices.push_back({line.xy(), 0.0f});
-            shadow_vertices.push_back({line.zw(), 0.0f});
-            shadow_vertices.push_back({line.zw(), 1.0f});
+        // std::vector<glm::vec3> shadow_vertices;
+        // shadow_vertices.reserve(shadow_lines.size() * 6);
+        // for (auto& line : shadow_lines) {
+        //     shadow_vertices.push_back({line.xy(), 0.0f});
+        //     shadow_vertices.push_back({line.zw(), 0.0f});
+        //     shadow_vertices.push_back({line.zw(), 1.0f});
 
-            shadow_vertices.push_back({line.xy(), 0.0f});
-            shadow_vertices.push_back({line.zw(), 1.0f});
-            shadow_vertices.push_back({line.xy(), 1.0f});
-        }
+        //     shadow_vertices.push_back({line.xy(), 0.0f});
+        //     shadow_vertices.push_back({line.zw(), 1.0f});
+        //     shadow_vertices.push_back({line.xy(), 1.0f});
+        // }
 
-        VertexBuffer shadow_buffer({3}, shadow_vertices);
+        // VertexBuffer shadow_buffer({3}, shadow_vertices);
 
-        shader_shadow->uniform("transform", transform);
+        // shader_shadow->uniform("transform", transform);
 
-        shadow_fbo.bind();
+        // shadow_fbo.bind();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        // glDisable(GL_DEPTH_TEST);
+        // glEnable(GL_BLEND);
+        // glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-        shader_shadow->use();
+        // shader_shadow->use();
 
-        for (auto& light : lights) {
-            shader_shadow->uniform("light_pos", light.pos);
-            shadow_buffer.draw();
-        }
+        // for (auto& light : lights) {
+        //     shader_shadow->uniform("light_pos", light.pos);
+        //     shadow_buffer.draw();
+        // }
 
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
+        // glDisable(GL_BLEND);
+        // glEnable(GL_DEPTH_TEST);
 
-        shadow_fbo.unbind();
+        // shadow_fbo.unbind();
 
         // LIGHTING PASS
 
