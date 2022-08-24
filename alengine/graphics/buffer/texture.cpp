@@ -10,6 +10,10 @@ namespace ae {
 
         glGenTextures(1, &texture);
     }
+    TextureBuffer::~TextureBuffer() {
+        glDeleteTextures(1, &texture);
+        glDeleteBuffers(1, &buffer);
+    }
 
     void TextureBuffer::bind() {
         glBindTexture(GL_TEXTURE_BUFFER, texture);

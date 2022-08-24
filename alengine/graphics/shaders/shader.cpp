@@ -62,12 +62,13 @@ layout (location = 0) in vec2 aPos;
 
 out vec2 FragPos;
 
-uniform mat4 transform;
+uniform mat4 projection;
+uniform mat4 view;
 
 void main() {
-    gl_Position = transform * vec4(aPos, 0.0, 1.0);
+    gl_Position = projection * vec4(aPos, 0.0, 1.0);
 
-    FragPos = aPos.xy;
+    FragPos = vec3(view * vec4(aPos, 0.0, 1.0)).xy;
 }
 )", R"(
 #version 330 core

@@ -45,7 +45,6 @@ namespace ae {
 
     void Renderer::render_start() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
     void Renderer::render(const Renderable& object, const glm::vec2& translate) {
         auto vertices = object.vertices();
@@ -68,7 +67,9 @@ namespace ae {
         }
     }
     void Renderer::render_end() {
-        glm::mat4 transform = Camera::projection() * Camera::view();
+        glm::mat4 view = Camera::view();
+        glm::mat4 projection = Camera::projection();
+        glm::mat4 transform = projection * view;
 
         // LIGHTING PASS
 
@@ -80,7 +81,8 @@ namespace ae {
         shader_light->uniform("lights", 0);
         shader_light->uniform("n_lights", (int)lights.size());
 
-        shader_light->uniform("transform", transform);
+        shader_light->uniform("projection", projection);
+        shader_light->uniform("view", view);
 
         light_fbo.bind();
 
@@ -122,8 +124,9 @@ namespace ae {
 
         main_fbo.unbind();
 
-
         // POSTPROCESSING PASS
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, main_fbo.tex());

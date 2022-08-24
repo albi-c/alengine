@@ -6,7 +6,6 @@ namespace ae {
     class Camera {
     public:
         static inline glm::vec2 pos;
-        static inline float zoom = 1;
 
         static void init();
 

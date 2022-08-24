@@ -11,6 +11,7 @@ namespace ae {
 
         TextureBuffer(const std::vector<float>& data);
         TextureBuffer(const void* data, std::size_t length);
+        ~TextureBuffer();
 
         void bind();
     };
