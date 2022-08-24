@@ -50,24 +50,40 @@ in vec2 TexCoord;
 
 out vec4 FragColor;
 
-uniform sampler2D tex_main;
+uniform sampler2D tex_main1;
+uniform sampler2D tex_main2;
+
+uniform sampler2D tex_depth1;
+uniform sampler2D tex_depth2;
+
 uniform sampler2D tex_light;
 
 void main() {
-    vec3 color = texture(tex_main, TexCoord).xyz;
-    vec3 light = texture(tex_light, TexCoord).xyz;
+    float depth1 = texture(tex_depth1, TexCoord).r;
+    float depth2 = texture(tex_depth2, TexCoord).r;
 
-    vec3 o = color * light + light * 0.01;
+    vec3 light = texture(tex_light, TexCoord).rgb;
+
+    vec3 color = texture(tex_main1, TexCoord).rgb;
+
+    vec3 o = color * (light + 0.05) + light * 0.1 + 0.003;
+
+    if (depth1 > depth2) {
+        o = texture(tex_main2, TexCoord).rgb;
+    }
+    
     o /= o + 1.0;
-    o = pow(o, vec3(1 / 1.5));
+    o = pow(o, vec3(1.0 / 1.8));
 
     FragColor = vec4(o, 1.0);
 }
 )"}}, {"light", {R"(
 #version 330 core
 layout (location = 0) in vec2 aPos;
+layout (location = 1) in vec2 aTex;
 
 out vec2 FragPos;
+out vec2 TexCoord;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -76,10 +92,12 @@ void main() {
     gl_Position = projection * vec4(aPos, 0.0, 1.0);
 
     FragPos = vec3(view * vec4(aPos, 0.0, 1.0)).xy;
+    TexCoord = aTex;
 }
 )", R"(
 #version 330 core
 in vec2 FragPos;
+in vec2 TexCoord;
 
 out vec4 FragColor;
 
@@ -87,15 +105,79 @@ uniform vec2 light_pos;
 uniform float light_range;
 uniform vec3 light_color;
 
+uniform sampler2D tex_shadow;
+
 void main() {
-    vec3 light = vec3(0.3);
+    vec3 light = vec3(0.0);
+
+    if (texture(tex_shadow, TexCoord).r > 0.5) {
+        FragColor = vec4(light, 0.0);
+        return;
+    }
 
     float d = distance(light_pos, FragPos);
     if (d <= light_range) {
-        light += light_color * (light_range - d) / light_range;
+        light = (light_color * (light_range - d) / light_range);
     }
 
     FragColor = vec4(light, 1.0);
+}
+)"}}, {"shadow", {R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+
+uniform mat4 transform;
+
+uniform vec2 light_pos;
+
+void main() {
+    gl_Position = transform * vec4(aPos.xy - aPos.z * light_pos * 100000000.0, 0.0, 1.0);
+}
+)", R"(
+#version 330 core
+out vec4 FragColor;
+
+void main() {
+    FragColor = vec4(1.0);
+}
+)"}}, {"blur", {R"(
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 aTex;
+
+out vec2 TexCoord;
+
+void main() {
+    gl_Position = vec4(aPos.xy, 0.0, 1.0);
+
+    TexCoord = aTex;
+}
+)", R"(
+#version 330 core
+in vec2 TexCoord;
+
+out vec4 FragColor;
+
+uniform sampler2D tex_input;
+
+vec2 offsets[] = vec2[](
+    vec2(-2.0,  2.0), vec2(-1.0,  2.0), vec2( 0.0,  2.0), vec2( 1.0,  2.0), vec2( 2.0,  2.0),
+    vec2(-2.0,  1.0), vec2(-1.0,  1.0), vec2( 0.0,  1.0), vec2( 1.0,  1.0), vec2( 2.0,  1.0),
+    vec2(-2.0,  0.0), vec2(-1.0,  0.0), vec2( 0.0,  0.0), vec2( 1.0,  0.0), vec2( 2.0,  0.0),
+    vec2(-2.0, -1.0), vec2(-1.0, -1.0), vec2( 0.0, -1.0), vec2( 1.0, -1.0), vec2( 2.0, -1.0),
+    vec2(-2.0, -2.0), vec2(-1.0, -2.0), vec2( 0.0, -2.0), vec2( 1.0, -2.0), vec2( 2.0, -2.0)
+);
+
+void main() {
+    vec3 color = vec3(0.0);
+    vec2 texel = 1.0 / textureSize(tex_input, 0);
+    for (int i = 0; i < offsets.length; i++) {
+        color += texture(tex_input, TexCoord + offsets[i] * texel * 2).rgb;
+    }
+
+    color /= offsets.length();
+
+    FragColor = vec4(color, 1.0);
 }
 )"}}
 };

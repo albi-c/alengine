@@ -7,13 +7,14 @@ namespace ae {
     public:
         ~Framebuffer();
 
-        void init(int width, int height, bool depth_only = false);
+        void init(int width, int height, bool depth_only = false, bool depth_texture = false);
         void destroy();
 
         void bind();
         void unbind();
 
         GLuint tex();
+        GLuint tex_depth();
     
     private:
         int width, height;
@@ -22,6 +23,6 @@ namespace ae {
 
         GLuint fbo;
         GLuint rbo;
-        GLuint texture;
+        GLuint texture, texture_depth;
     };
 };

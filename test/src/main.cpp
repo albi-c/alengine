@@ -62,10 +62,10 @@ public:
           player({50.0f, 250.0f}, {50.0f, 100.0f}),
           wall({{0.2f, 0.2f, 0.2f}}, {0.0f, 100.0f}, {1920.0f, 100.0f}),
           circle({{0.5f, 0.0f, 0.0f}}, {250.0f, 250.0f}, 50.0f),
-          light({100.0f, 300.0f}, 300.0f, {2.0f, 1.8f, 1.7f}),
+          light({100.0f, 300.0f}, 500.0f, {2.0f, 1.8f, 1.7f}),
           light2({400.0f, 600.0f}, 150.0f, {1.8f, 0.0f, 2.0f}) {
         
-        wall.layer = -1;
+        circle.layer = -1;
         
         ae::Event::on<ae::EventWindowResize>([&](const ae::EventWindowResize& e) {
             wall.size.x = e.width;

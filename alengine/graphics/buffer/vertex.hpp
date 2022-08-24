@@ -5,7 +5,7 @@
 #include "graphics/opengl.hpp"
 
 namespace ae {
-    template <class T>
+    template <class T, int V = GL_TRIANGLES>
     class VertexBuffer {
     public:
         GLuint VAO, VBO;
@@ -42,7 +42,7 @@ namespace ae {
 
         void draw() const {
             glBindVertexArray(VAO);
-            glDrawArrays(GL_TRIANGLES, 0, num_vertices);
+            glDrawArrays(V, 0, num_vertices);
         }
     
     private:
