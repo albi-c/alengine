@@ -5,23 +5,27 @@
 #include "graphics/buffer/texture.hpp"
 
 namespace ae {
-    static const std::vector<TexVertex> WHOLE_SCREEN_VERTICES = {
-        {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
-        {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}},
-        {{ 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},
-        {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
-        {{ 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},
-        {{ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}}
+    static const std::vector<std::pair<glm::vec2, glm::vec2>> WHOLE_SCREEN_VERTICES = {
+        {{-1.0f, -1.0f}, {0.0f, 0.0f}},
+        {{-1.0f,  1.0f}, {0.0f, 1.0f}},
+        {{ 1.0f,  1.0f}, {1.0f, 1.0f}},
+        {{-1.0f, -1.0f}, {0.0f, 0.0f}},
+        {{ 1.0f,  1.0f}, {1.0f, 1.0f}},
+        {{ 1.0f, -1.0f}, {1.0f, 0.0f}}
     };
 
     void Renderer::init() {
         resize(1, 1);
 
-        shader = new Shader("color");
+        shader = new Shader("main");
         shader_light = new Shader("light");
         shader_post = new Shader("post");
 
-        whole_screen = new VertexBuffer<TexVertex>({3, 2}, WHOLE_SCREEN_VERTICES);
+        whole_screen = new VertexBuffer({2, 2}, WHOLE_SCREEN_VERTICES);
+
+        buffer_rect = new VertexBuffer({2, 2}, get_vertices_rect());
+        buffer_circle = new VertexBuffer({2, 2}, get_vertices_circle());
+        buffer_line = new VertexBuffer({2, 2}, get_vertices_line());
 
         main_fbo.init(width, height);
         light_fbo.init(width, height);
@@ -40,46 +44,37 @@ namespace ae {
             delete shader_light;
             delete shader_post;
 
+            delete whole_screen;
+            
+            delete buffer_rect;
+            delete buffer_circle;
+            delete buffer_line;
+
             main_fbo.destroy();
             light_fbo.destroy();
         }
     }
 
+    void Renderer::render(const Rect& rect) {
+        rects.push_back(rect);
+    }
+    void Renderer::render(const Circle& circle) {
+        circles.push_back(circle);
+    }
+    void Renderer::render(const Line& line) {
+        lines.push_back(line);
+    }
+    void Renderer::render(const Light& light) {
+        lights.push_back(light);
+    }
+
     void Renderer::render_start() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    }
-    void Renderer::render(const Renderable& object, const glm::vec2& translate) {
-        auto vertices = object.vertices();
-        if (translate != glm::vec2(0.0f)) {
-            std::vector<Vertex> t_vertices;
-            t_vertices.reserve(vertices.size());
-            for (auto& v : vertices) {
-                t_vertices.push_back({v.position + glm::vec3(translate, 0.0f), v.color});
-            }
-            vertices = t_vertices;
-        }
-        vertex_lists.push_back(vertices);
-        num_vertices += vertices.size();
-    }
-    void Renderer::render(Light light, const glm::vec2& translate) {
-        light.pos += translate;
-        lights.push_back(light);
     }
     void Renderer::render_end() {
         glm::mat4 view = Camera::view();
         glm::mat4 projection = Camera::projection();
         glm::mat4 transform = projection * view;
-
-        // VERTICES
-
-        std::vector<Vertex> vertices;
-        vertices.reserve(num_vertices);
-
-        for (auto& vl : vertex_lists) {
-            vertices.insert(vertices.end(), vl.begin(), vl.end());
-        }
-
-        VertexBuffer buffer({3, 3}, vertices);
 
         // LIGHTING PASS
 
@@ -121,12 +116,44 @@ namespace ae {
 
         shader->uniform("transform", transform);
 
+        shader->uniform("texture1", 0);
+
         main_fbo.bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shader->use();
-        buffer.draw();
+        for (auto& rect : rects) {
+            shader->uniform("model", glm::translate(glm::scale(glm::mat4(1.0f), {rect.size, 0.0f}), {rect.pos, 0.0f}));
+            shader->uniform("layer", (float)rect.layer);
+
+            if (rect.mat.texture != nullptr) {
+                glActiveTexture(GL_TEXTURE0);
+                rect.mat.texture->bind();
+
+                shader->uniform("texture_enabled", true);
+            } else {
+                shader->uniform("texture_enabled", false);
+            }
+            shader->uniform("color", rect.mat.color);
+
+            buffer_rect->draw();
+        }
+        for (auto& circle : circles) {
+            shader->uniform("model", glm::translate(glm::scale(glm::mat4(1.0f), {circle.rad, circle.rad, 0.0f}), {circle.pos, 0.0f}));
+            shader->uniform("layer", (float)circle.layer);
+
+            if (circle.mat.texture != nullptr) {
+                glActiveTexture(GL_TEXTURE0);
+                circle.mat.texture->bind();
+
+                shader->uniform("texture_enabled", true);
+            } else {
+                shader->uniform("texture_enabled", false);
+            }
+            shader->uniform("color", circle.mat.color);
+
+            buffer_circle->draw();
+        }
 
         main_fbo.unbind();
 
@@ -149,10 +176,11 @@ namespace ae {
         
         // END
 
-        lights.clear();
+        rects.clear();
+        circles.clear();
+        lines.clear();
 
-        vertex_lists.clear();
-        num_vertices = 0;
+        lights.clear();
     }
 
     void Renderer::resize(int width, int height) {

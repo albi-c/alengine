@@ -1,12 +1,14 @@
 #pragma once
 
 #include "graphics/render/drawable.hpp"
-#include "graphics/render/renderer.hpp"
+#include "graphics/render/material.hpp"
 
-namespace ae::object {
+namespace ae {
     class Object : public Drawable {
     public:
-        inline Object(int layer = 0)
-            : Drawable(layer) {}
+        Material mat;
+
+        inline Object(Material mat, int layer = 0)
+            : Drawable(layer), mat(mat) {}
     };
 };

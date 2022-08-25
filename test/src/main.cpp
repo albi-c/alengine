@@ -1,22 +1,18 @@
 #include "alengine.hpp"
 
-#include "objects/shapes/rect.hpp"
-#include "objects/shapes/circle.hpp"
-#include "objects/shapes/line.hpp"
 #include "camera/camera.hpp"
-#include "entity/player.hpp"
 
 #include <iostream>
 
-class Player : public ae::entity::Player {
+class Player : public ae::Rect {
 public:
-    ae::object::Rect obj;
+    ae::Rect obj;
 
     glm::vec2 pos;
     glm::vec2 size;
 
     Player(const glm::vec2& pos, const glm::vec2& size)
-        : obj({{1.0f, 0.8f, 0.6f}}, &this->pos, &this->size), pos(pos), size(size), ae::entity::Player(obj) {}
+        : pos(pos), size(size), Rect({{1.0f, 1.0f, 1.0f}}, &this->pos, &this->size) {}
     
     void move(const glm::vec2& m) {
         pos += m;
@@ -30,38 +26,13 @@ public:
     }
 };
 
-class PlayerLine : public ae::entity::Player {
-public:
-    ae::object::Line obj;
-
-    glm::vec2 p1;
-    glm::vec2 p2;
-
-    PlayerLine(const glm::vec2& p1, const glm::vec2& p2)
-        : obj({{0.0f, 0.0f, 1.0f}}, &this->p1, &this->p2), p1(p1), p2(p2), ae::entity::Player(obj) {}
-    
-    void move(const glm::vec2& m) {
-        p1 += m;
-        p2 += m;
-    }
-
-    void moveX(float m) {
-        p1.x += m;
-        p2.x += m;
-    }
-    void moveY(float m) {
-        p1.y += m;
-        p2.y += m;
-    }
-};
-
 class Game : public ae::Game {
 public:
     Game()
         : ae::Game("Test Game"),
           player({50.0f, 250.0f}, {50.0f, 100.0f}),
-          wall({{0.2f, 0.2f, 0.2f}}, {0.0f, 100.0f}, {1920.0f, 100.0f}),
-          circle({{0.5f, 0.0f, 0.0f}}, {250.0f, 250.0f}, 50.0f),
+          wall({{0.5f, 0.5f, 0.5f}}, {0.0f, 100.0f}, {1920.0f, 100.0f}),
+          circle({{1.0f, 0.0f, 0.0f}}, {250.0f, 250.0f}, 50.0f),
           light({100.0f, 300.0f}, 200.0f, {1.0, 1.0, 1.0}),
           light2({400.0f, 600.0f}, 50.0f, {1.0, 0.0, 1.0}) {
         
@@ -116,12 +87,12 @@ public:
         });
 
         ae::Event::on<ae::EventDraw>([&](const ae::EventDraw&) {
-            player.draw();
-            wall.draw();
-            circle.draw();
+            ae::Renderer::render(player.obj);
+            ae::Renderer::render(wall);
+            ae::Renderer::render(circle);
 
-            light.draw();
-            light2.draw();
+            ae::Renderer::render(light);
+            ae::Renderer::render(light2);
         });
 
         run();
@@ -130,8 +101,8 @@ public:
 private:
     Player player;
 
-    ae::object::Rect wall;
-    ae::object::Circle circle;
+    ae::Rect wall;
+    ae::Circle circle;
 
     ae::Light light, light2;
 };

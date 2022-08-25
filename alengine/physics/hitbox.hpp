@@ -2,7 +2,7 @@
 
 #include "util/glm.hpp"
 
-namespace ae::physics {
+namespace ae {
     class HitboxPoint;
     class HitboxAABB;
     class HitboxLine;

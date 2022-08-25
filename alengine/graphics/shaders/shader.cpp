@@ -7,32 +7,46 @@
 #include "util/util.hpp"
 
 static const std::map<std::string, std::pair<const char*, const char*>> BUILTIN_SHADERS = {
-    {"color", {R"(
+    {"main", {R"(
 #version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aColor;
+layout (location = 0) in vec2 aPos;
+layout (location = 1) in vec2 aTex;
 
-out vec3 Color;
+out vec2 TexCoord;
 
 uniform mat4 transform;
+uniform mat4 model;
+
+uniform float layer;
 
 void main() {
-    gl_Position = transform * vec4(aPos, 1.0);
+    gl_Position = transform * model * vec4(aPos, layer, 1.0);
 
-    Color = aColor;
+    TexCoord = aTex;
 }
 )", R"(
 #version 330 core
-in vec3 Color;
+in vec2 TexCoord;
 
 out vec4 FragColor;
 
+uniform sampler2D texture1;
+uniform bool texture_enabled;
+
+uniform vec3 color;
+
 void main() {
-    FragColor = vec4(Color, 1.0);
+    vec3 col = color;
+
+    if (texture_enabled) {
+        col *= texture(texture1, TexCoord).rgb;
+    }
+
+    FragColor = vec4(col, 1.0);
 }
 )"}}, {"post", {R"(
 #version 330 core
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec2 aTex;
 
 out vec2 TexCoord;
@@ -40,7 +54,7 @@ out vec2 TexCoord;
 uniform mat4 transform;
 
 void main() {
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = vec4(aPos, 0.0, 1.0);
 
     TexCoord = aTex;
 }

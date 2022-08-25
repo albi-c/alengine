@@ -1,6 +1,6 @@
-#include "collision.hpp"
+#include "hitbox.hpp"
 
-namespace ae::physics {
+namespace ae {
     static const float TOLERANCE = 0.001f;
 
     bool Hitbox::collide(const HitboxPoint& h) const {
