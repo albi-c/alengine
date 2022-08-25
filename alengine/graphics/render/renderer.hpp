@@ -25,21 +25,16 @@ namespace ae {
 
         static inline bool initialized = false;
 
-        static inline int num_vertices_back = 0;
-        static inline std::vector<std::vector<Vertex>> vertex_lists_back;
-        static inline int num_vertices_front = 0;
-        static inline std::vector<std::vector<Vertex>> vertex_lists_front;
+        static inline int num_vertices = 0;
+        static inline std::vector<std::vector<Vertex>> vertex_lists;
 
         static inline std::vector<Light> lights;
 
         static inline Shader* shader;
-        static inline Shader* shader_shadow;
         static inline Shader* shader_light;
         static inline Shader* shader_post;
 
-        static inline Framebuffer main_fbo1;
-        static inline Framebuffer main_fbo2;
-        static inline Framebuffer shadow_fbo;
+        static inline Framebuffer main_fbo;
         static inline Framebuffer light_fbo;
 
         static inline VertexBuffer<TexVertex>* whole_screen;
