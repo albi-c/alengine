@@ -64,6 +64,23 @@ namespace ae {
     void Renderer::render(const Line& line) {
         lines[line.mat.texture].push_back(line);
     }
+
+    // void Renderer::render(const std::vector<Rect>& rects) {
+    //     for (auto& rect : rects) {
+    //         render(rect);
+    //     }
+    // }
+    // void Renderer::render(const std::vector<Circle>& circles) {
+    //     for (auto& circle : circles) {
+    //         render(circle);
+    //     }
+    // }
+    // void Renderer::render(const std::vector<Line>& lines) {
+    //     for (auto& line : lines) {
+    //         render(line);
+    //     }
+    // }
+
     void Renderer::render(const Light& light) {
         lights.push_back(light);
     }

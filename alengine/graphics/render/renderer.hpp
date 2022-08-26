@@ -26,6 +26,10 @@ namespace ae {
         static void render(const Circle& circle);
         static void render(const Line& line);
 
+        // static void render(const std::vector<Rect>& rects);
+        // static void render(const std::vector<Circle>& circles);
+        // static void render(const std::vector<Line>& lines);
+
         static void render(const Light& light);
 
         static void render_start();
