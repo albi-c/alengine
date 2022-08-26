@@ -24,6 +24,8 @@ namespace ae {
         HitboxPoint(const glm::vec2& pos);
         HitboxPoint(glm::vec2* pos);
 
+        HitboxPoint& operator=(const HitboxPoint& other);
+
         virtual bool collide(const Hitbox& h) const;
         virtual bool collide(const HitboxPoint& h) const;
         virtual bool collide(const HitboxAABB& h) const;
@@ -42,6 +44,8 @@ namespace ae {
         HitboxAABB();
         HitboxAABB(const glm::vec2& pos, const glm::vec2& size);
         HitboxAABB(glm::vec2* pos, glm::vec2* size);
+
+        HitboxAABB& operator=(const HitboxAABB& other);
 
         virtual bool collide(const Hitbox& h) const;
         virtual bool collide(const HitboxPoint& h) const;
@@ -62,6 +66,8 @@ namespace ae {
         HitboxLine();
         HitboxLine(const glm::vec2& p1, const glm::vec2& p2);
         HitboxLine(glm::vec2* p1, glm::vec2* p2);
+
+        HitboxLine& operator=(const HitboxLine& other);
 
         float length() const;
 
@@ -84,6 +90,8 @@ namespace ae {
         HitboxCircle();
         HitboxCircle(const glm::vec2& pos, float rad);
         HitboxCircle(glm::vec2* pos, float* rad);
+
+        HitboxCircle& operator=(const HitboxCircle& other);
 
         virtual bool collide(const Hitbox& h) const;
         virtual bool collide(const HitboxPoint& h) const;

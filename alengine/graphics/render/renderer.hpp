@@ -26,9 +26,28 @@ namespace ae {
         static void render(const Circle& circle);
         static void render(const Line& line);
 
-        // static void render(const std::vector<Rect>& rects);
-        // static void render(const std::vector<Circle>& circles);
-        // static void render(const std::vector<Line>& lines);
+        static void render(const std::vector<Rect>& rects);
+        static void render(const std::vector<Circle>& circles);
+        static void render(const std::vector<Line>& lines);
+
+        template <class T>
+        inline static void render(const std::map<T, Rect>& rects) {
+            for (auto& [_, rect] : rects) {
+                render(rect);
+            }
+        }
+        template <class T>
+        inline static void render(const std::map<T, Circle>& circles) {
+            for (auto& [_, circle] : circles) {
+                render(circle);
+            }
+        }
+        template <class T>
+        inline static void render(const std::map<T, Line>& lines) {
+            for (auto& [_, line] : lines) {
+                render(line);
+            }
+        }
 
         static void render(const Light& light);
 

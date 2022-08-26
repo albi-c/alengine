@@ -23,6 +23,14 @@ namespace ae {
     HitboxPoint::HitboxPoint(glm::vec2* pos)
         : pos(*pos) {}
     
+    HitboxPoint& HitboxPoint::operator=(const HitboxPoint& other) {
+        pos = pos_;
+
+        pos_ = other.pos;
+
+        return *this;
+    }
+    
     bool HitboxPoint::collide(const Hitbox& h) const {
         return h.collide(*this);
     }
@@ -48,6 +56,16 @@ namespace ae {
         : pos(pos_), size(size_), pos_(pos), size_(size) {}
     HitboxAABB::HitboxAABB(glm::vec2* pos, glm::vec2* size)
         : pos(*pos), size(*size) {}
+    
+    HitboxAABB& HitboxAABB::operator=(const HitboxAABB& other) {
+        pos = pos_;
+        size = size_;
+
+        pos_ = other.pos;
+        size_ = other.size;
+
+        return *this;
+    }
 
     bool HitboxAABB::collide(const Hitbox& h) const {
         return h.collide(*this);
@@ -92,6 +110,16 @@ namespace ae {
         : p1(p1_), p2(p2_), p1_(p1), p2_(p2) {}
     HitboxLine::HitboxLine(glm::vec2* p1, glm::vec2* p2)
         : p1(*p1), p2(*p2) {}
+    
+    HitboxLine& HitboxLine::operator=(const HitboxLine& other) {
+        p1 = p1_;
+        p2 = p2_;
+
+        p1_ = other.p1;
+        p2_ = other.p2;
+
+        return *this;
+    }
     
     float HitboxLine::length() const {
         return glm::distance(p1, p2);
@@ -148,6 +176,16 @@ namespace ae {
         : pos(pos_), rad(rad_), pos_(pos), rad_(rad) {}
     HitboxCircle::HitboxCircle(glm::vec2* pos, float* rad)
         : pos(*pos), rad(*rad) {}
+    
+    HitboxCircle& HitboxCircle::operator=(const HitboxCircle& other) {
+        pos = pos_;
+        rad = rad_;
+
+        pos_ = other.pos;
+        rad_ = other.rad;
+
+        return *this;
+    }
     
     bool HitboxCircle::collide(const Hitbox& h) const {
         return h.collide(*this);

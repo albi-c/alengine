@@ -6,13 +6,8 @@
 
 class Player : public ae::Rect {
 public:
-    ae::Rect obj;
-
-    glm::vec2 pos;
-    glm::vec2 size;
-
     Player(const glm::vec2& pos, const glm::vec2& size)
-        : pos(pos), size(size), Rect({{1.0f, 1.0f, 1.0f}}, &this->pos, &this->size) {}
+        : Rect({{1.0f, 1.0f, 1.0f}}, pos, size) {}
     
     void move(const glm::vec2& m) {
         pos += m;
@@ -38,11 +33,19 @@ public:
         
         circle.layer = -1;
 
-        // for (int i = 0; i < 10; i++) {
-        //     for (int j = 0; j < 10; j++) {
-        //         circles.push_back(ae::Circle({{1.0f - (i / 1000.0f), i / 1000.0f, 0.0f}}, {i * 10.0f, j * 10.0f}, 5.0f));
-        //     }
-        // }
+        int i = 0;
+        for (int x = 0; x < 20; x++) {
+            for (int y = 0; y < 20; y++) {
+                circles[i++] = ae::Circle({{x / 10.0f, y / 10.0f, 0.0f}}, {x * 50.0f, y * 50.0f}, 15.0f);
+            }
+        }
+
+        i = 0;
+        for (int x = 0; x < 20; x++) {
+            for (int y = 0; y < 20; y++) {
+                rects[i++] = ae::Rect({{x / 10.0f, y / 10.0f, 0.0f}}, {x * 50.0f + 1000.0f, y * 50.0f}, {15.0f, 20.0f});
+            }
+        }
         
         ae::Event::on<ae::EventWindowResize>([&](const ae::EventWindowResize& e) {
             wall.size.x = e.width;
@@ -57,7 +60,7 @@ public:
         ae::Event::on<ae::EventUpdate>([&](const ae::EventUpdate& e) {
             bool movedX = false;
             bool movedY = false;
-            glm::vec2 move = glm::vec2(0.0f);
+            glm::vec2 move = glm::vec2(0.0f, -0.5f);
             if (e.keys[ae::Key::W]) {
                 move.y += 1.0f;
                 movedY = !movedY;
@@ -75,16 +78,16 @@ public:
                 movedX = !movedX;
             }
             
-            if (movedX || movedY) {
+            if (move != glm::vec2(0.0f)) {
                 move = glm::normalize(move) * e.dt * 500.0f;
 
                 player.moveX(move.x);
-                if (player.obj.collide(wall) || player.obj.collide(circle)) {
+                if (player.collide(wall) || player.collide(circle)) {
                     player.moveX(-move.x);
                 }
 
                 player.moveY(move.y);
-                if (player.obj.collide(wall) || player.obj.collide(circle)) {
+                if (player.collide(wall) || player.collide(circle)) {
                     player.moveY(-move.y);
                 }
             }
@@ -93,9 +96,12 @@ public:
         });
 
         ae::Event::on<ae::EventDraw>([&](const ae::EventDraw&) {
-            ae::Renderer::render(player.obj);
+            ae::Renderer::render(player);
             ae::Renderer::render(wall);
             ae::Renderer::render(circle);
+
+            ae::Renderer::render(circles);
+            ae::Renderer::render(rects);
 
             ae::Renderer::render(light);
             ae::Renderer::render(light2);
@@ -110,7 +116,8 @@ private:
     ae::Rect wall;
     ae::Circle circle;
 
-    // std::vector<ae::Circle> circles;
+    std::map<int, ae::Circle> circles;
+    std::map<int, ae::Rect> rects;
 
     ae::Light light, light2;
 };

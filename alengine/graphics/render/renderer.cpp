@@ -4,6 +4,8 @@
 #include "camera/camera.hpp"
 #include "graphics/buffer/texture.hpp"
 
+#define ANTIALIASING 2
+
 namespace ae {
     static const std::vector<std::pair<glm::vec2, glm::vec2>> WHOLE_SCREEN_VERTICES = {
         {{-1.0f, -1.0f}, {0.0f, 0.0f}},
@@ -27,7 +29,7 @@ namespace ae {
         buffer_circle = new VertexBuffer({2, 2}, get_vertices_circle());
         buffer_line = new VertexBuffer({2, 2}, get_vertices_line());
 
-        main_fbo.init(width, height);
+        main_fbo.init(width * ANTIALIASING, height * ANTIALIASING);
         light_fbo.init(width, height);
 
         initialized = true;
@@ -65,21 +67,21 @@ namespace ae {
         lines[line.mat.texture].push_back(line);
     }
 
-    // void Renderer::render(const std::vector<Rect>& rects) {
-    //     for (auto& rect : rects) {
-    //         render(rect);
-    //     }
-    // }
-    // void Renderer::render(const std::vector<Circle>& circles) {
-    //     for (auto& circle : circles) {
-    //         render(circle);
-    //     }
-    // }
-    // void Renderer::render(const std::vector<Line>& lines) {
-    //     for (auto& line : lines) {
-    //         render(line);
-    //     }
-    // }
+    void Renderer::render(const std::vector<Rect>& rects) {
+        for (auto& rect : rects) {
+            render(rect);
+        }
+    }
+    void Renderer::render(const std::vector<Circle>& circles) {
+        for (auto& circle : circles) {
+            render(circle);
+        }
+    }
+    void Renderer::render(const std::vector<Line>& lines) {
+        for (auto& line : lines) {
+            render(line);
+        }
+    }
 
     void Renderer::render(const Light& light) {
         lights.push_back(light);
@@ -137,6 +139,8 @@ namespace ae {
 
         main_fbo.bind();
 
+        glViewport(0, 0, width * ANTIALIASING, height * ANTIALIASING);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto& [tex, rectv] : rects) {
@@ -179,6 +183,9 @@ namespace ae {
                 buffer_circle->draw();
             }
         }
+        // TODO: rendering lines
+
+        glViewport(0, 0, width, height);
 
         main_fbo.unbind();
 
@@ -215,7 +222,7 @@ namespace ae {
         glViewport(0, 0, width, height);
 
         main_fbo.destroy();
-        main_fbo.init(width, height);
+        main_fbo.init(width * ANTIALIASING, height * ANTIALIASING);
 
         light_fbo.destroy();
         light_fbo.init(width, height);
