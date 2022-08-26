@@ -19,10 +19,12 @@ uniform mat4 model;
 
 uniform float layer;
 
+uniform vec2 texture_repeat;
+
 void main() {
     gl_Position = transform * model * vec4(aPos, layer, 1.0);
 
-    TexCoord = aTex;
+    TexCoord = aTex * texture_repeat;
 }
 )", R"(
 #version 330 core

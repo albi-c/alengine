@@ -6,13 +6,13 @@
 #include "graphics/framebuffer/framebuffer.hpp"
 #include "graphics/buffer/vertex.hpp"
 
-// #include "shapes.hpp"
 #include "objects/shapes.hpp"
 #include "objects/light.hpp"
 
 #include <memory>
 #include <utility>
 #include <vector>
+#include <map>
 
 namespace ae {
     struct RendererVertex;
@@ -38,9 +38,9 @@ namespace ae {
 
         static inline bool initialized = false;
 
-        static inline std::vector<Rect> rects;
-        static inline std::vector<Circle> circles;
-        static inline std::vector<Line> lines;
+        static inline std::map<std::shared_ptr<Texture>, std::vector<Rect>> rects;
+        static inline std::map<std::shared_ptr<Texture>, std::vector<Circle>> circles;
+        static inline std::map<std::shared_ptr<Texture>, std::vector<Line>> lines;
 
         static inline std::vector<Light> lights;
 

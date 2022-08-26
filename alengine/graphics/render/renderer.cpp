@@ -56,13 +56,13 @@ namespace ae {
     }
 
     void Renderer::render(const Rect& rect) {
-        rects.push_back(rect);
+        rects[rect.mat.texture].push_back(rect);
     }
     void Renderer::render(const Circle& circle) {
-        circles.push_back(circle);
+        circles[circle.mat.texture].push_back(circle);
     }
     void Renderer::render(const Line& line) {
-        lines.push_back(line);
+        lines[line.mat.texture].push_back(line);
     }
     void Renderer::render(const Light& light) {
         lights.push_back(light);
@@ -122,37 +122,45 @@ namespace ae {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        for (auto& rect : rects) {
-            shader->uniform("model", glm::translate(glm::scale(glm::mat4(1.0f), {rect.size, 0.0f}), {rect.pos / rect.size, 0.0f}));
-            shader->uniform("layer", (float)rect.layer);
-
-            if (rect.mat.texture != nullptr) {
+        for (auto& [tex, rectv] : rects) {
+            if (tex) {
                 glActiveTexture(GL_TEXTURE0);
-                rect.mat.texture->bind();
+                tex->bind();
 
                 shader->uniform("texture_enabled", true);
             } else {
                 shader->uniform("texture_enabled", false);
             }
-            shader->uniform("color", rect.mat.color);
+            for (auto& rect : rectv) {
+                shader->uniform("model", glm::translate(glm::scale(glm::mat4(1.0f), {rect.size, 1.0f}), {rect.pos / rect.size, 1.0f}));
+                shader->uniform("layer", (float)rect.layer);
+                
+                shader->uniform("color", rect.mat.color);
 
-            buffer_rect->draw();
+                shader->uniform("texture_repeat", rect.mat.texture_repeat);
+
+                buffer_rect->draw();
+            }
         }
-        for (auto& circle : circles) {
-            shader->uniform("model", glm::translate(glm::scale(glm::mat4(1.0f), {glm::vec2(circle.rad), 0.0f}), {circle.pos / circle.rad, 0.0f}));
-            shader->uniform("layer", (float)circle.layer);
-
-            if (circle.mat.texture != nullptr) {
+        for (auto& [tex, circlev] : circles) {
+            if (tex) {
                 glActiveTexture(GL_TEXTURE0);
-                circle.mat.texture->bind();
+                tex->bind();
 
                 shader->uniform("texture_enabled", true);
             } else {
                 shader->uniform("texture_enabled", false);
             }
-            shader->uniform("color", circle.mat.color);
+            for (auto& circle : circlev) {
+                shader->uniform("model", glm::translate(glm::scale(glm::mat4(1.0f), {glm::vec2(circle.rad), 1.0f}), {circle.pos / circle.rad, 1.0f}));
+                shader->uniform("layer", (float)circle.layer);
 
-            buffer_circle->draw();
+                shader->uniform("color", circle.mat.color);
+
+                shader->uniform("texture_repeat", circle.mat.texture_repeat);
+
+                buffer_circle->draw();
+            }
         }
 
         main_fbo.unbind();

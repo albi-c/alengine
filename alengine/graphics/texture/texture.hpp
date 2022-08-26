@@ -7,6 +7,7 @@
 namespace ae {
     class Texture {
     public:
+        Texture(Texture* other);
         Texture(const std::string& filename);
         ~Texture();
 

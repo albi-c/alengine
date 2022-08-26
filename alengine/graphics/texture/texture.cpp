@@ -4,6 +4,8 @@
 #include "util/util.hpp"
 
 namespace ae {
+    Texture::Texture(Texture* other)
+        : texture(other->texture) {}
     Texture::Texture(const std::string& filename) {
         stbi_set_flip_vertically_on_load(true);
         int width, height;
