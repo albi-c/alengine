@@ -6,13 +6,8 @@
 
 class Player : public ae::Rect {
 public:
-    ae::Rect obj;
-
-    glm::vec2 pos;
-    glm::vec2 size;
-
     Player(const glm::vec2& pos, const glm::vec2& size)
-        : pos(pos), size(size), Rect({{1.0f, 1.0f, 1.0f}}, &this->pos, &this->size) {}
+        : Rect({{1.0f, 1.0f, 1.0f}}, pos, size) {}
     
     void move(const glm::vec2& m) {
         pos += m;
@@ -71,15 +66,15 @@ public:
             
             if (movedX || movedY) {
                 move = glm::normalize(move) * e.dt * 500.0f;
-
+                
                 player.moveX(move.x);
-                if (player.obj.collide(wall) || player.obj.collide(circle)) {
-                    player.moveX(-move.x);
+                while (player.collide(wall) || player.collide(circle)) {
+                    player.moveX(-(move.x * 0.125));
                 }
 
                 player.moveY(move.y);
-                if (player.obj.collide(wall) || player.obj.collide(circle)) {
-                    player.moveY(-move.y);
+                while (player.collide(wall) || player.collide(circle)) {
+                    player.moveY(-(move.y * 0.125));
                 }
             }
 
@@ -87,7 +82,7 @@ public:
         });
 
         ae::Event::on<ae::EventDraw>([&](const ae::EventDraw&) {
-            ae::Renderer::render(player.obj);
+            ae::Renderer::render(player);
             ae::Renderer::render(wall);
             ae::Renderer::render(circle);
 

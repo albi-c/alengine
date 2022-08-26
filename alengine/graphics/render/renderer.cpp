@@ -123,7 +123,7 @@ namespace ae {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto& rect : rects) {
-            shader->uniform("model", glm::translate(glm::scale(glm::mat4(1.0f), {rect.size, 0.0f}), {rect.pos, 0.0f}));
+            shader->uniform("model", glm::translate(glm::scale(glm::mat4(1.0f), {rect.size, 0.0f}), {rect.pos / rect.size, 0.0f}));
             shader->uniform("layer", (float)rect.layer);
 
             if (rect.mat.texture != nullptr) {
@@ -139,7 +139,7 @@ namespace ae {
             buffer_rect->draw();
         }
         for (auto& circle : circles) {
-            shader->uniform("model", glm::translate(glm::scale(glm::mat4(1.0f), {circle.rad, circle.rad, 0.0f}), {circle.pos, 0.0f}));
+            shader->uniform("model", glm::translate(glm::scale(glm::mat4(1.0f), {glm::vec2(circle.rad), 0.0f}), {circle.pos / circle.rad, 0.0f}));
             shader->uniform("layer", (float)circle.layer);
 
             if (circle.mat.texture != nullptr) {
