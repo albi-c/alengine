@@ -1,8 +1,10 @@
 #include "alengine.hpp"
 
 #include "camera/camera.hpp"
+#include "graphics/texture/texture.hpp"
 
 #include <iostream>
+#include <memory>
 
 class Player : public ae::Rect {
 public:
@@ -26,8 +28,8 @@ public:
     Game()
         : ae::Game("Test Game"),
           player({50.0f, 250.0f}, {50.0f, 100.0f}),
-          wall({{0.5f, 0.5f, 0.5f}}, {0.0f, 100.0f}, {1920.0f, 100.0f}),
-          circle({{1.0f, 0.0f, 0.0f}}, {250.0f, 250.0f}, 50.0f),
+          wall({glm::vec3(1.0f), std::make_shared<ae::Texture>("../res/box.png"), {19.2f, 1.0f}}, {0.0f, 100.0f}, {1920.0f, 100.0f}),
+          circle({glm::vec3(1.0f), std::make_shared<ae::Texture>("../res/box.png")}, {250.0f, 250.0f}, 50.0f),
           light({100.0f, 300.0f}, 200.0f, {1.0, 1.0, 1.0}),
           light2({400.0f, 600.0f}, 50.0f, {1.0, 0.0, 1.0}) {
         
